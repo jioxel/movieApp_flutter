@@ -35,13 +35,57 @@ class _HomeViewState extends ConsumerState<_HomeView> {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final moviesSlidesShow = ref.watch(moviesSlidesShowProvider);
     if (moviesSlidesShow.isEmpty) return const CircularProgressIndicator();
-    return Column(
-      children: [
-        CustomAppBar(),
-        MoviesSlideShow(
-          movies: moviesSlidesShow,
-        )
-      ],
-    );
+    return CustomScrollView(slivers: [
+      SliverAppBar(
+        floating: true,
+        flexibleSpace: FlexibleSpaceBar(
+          title: CustomAppBar(),
+        ),
+      ),
+      SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return Column(
+            children: [
+              MoviesSlideShow(
+                movies: moviesSlidesShow,
+              ),
+              MoviewHorizontalListview(
+                movies: nowPlayingMovies,
+                title: 'Cine',
+                subTitle: 'Only',
+                loadNextPage: () {
+                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                },
+              ),
+              MoviewHorizontalListview(
+                movies: nowPlayingMovies,
+                title: 'It come',
+                subTitle: 'this',
+                loadNextPage: () {
+                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                },
+              ),
+              MoviewHorizontalListview(
+                movies: nowPlayingMovies,
+                title: 'Popular',
+                loadNextPage: () {
+                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                },
+              ),
+              MoviewHorizontalListview(
+                movies: nowPlayingMovies,
+                title: 'Best top',
+                loadNextPage: () {
+                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                },
+              ),
+              SizedBox(
+                height: 20,
+              )
+            ],
+          );
+        }, childCount: 1),
+      )
+    ]);
   }
 }
