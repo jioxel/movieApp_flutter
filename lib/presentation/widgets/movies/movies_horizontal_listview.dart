@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:e_cinemapedia/config/helper/human_format.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain/entities/movie.dart';
 
@@ -94,7 +95,10 @@ class _Slide extends StatelessWidget {
                       strokeWidth: 2,
                     ));
                   }
-                  return FadeIn(child: child);
+                  return GestureDetector(
+                    onTap: () => context.push('/movie/${movie.id}'),
+                    child: FadeIn(child: child),
+                  );
                 },
               ),
             ),
