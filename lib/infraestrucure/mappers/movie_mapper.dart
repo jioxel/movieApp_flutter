@@ -16,7 +16,7 @@ class MovieMapper {
       popularity: movieDB.popularity,
       posterPath: movieDB.posterPath != ''
           ? 'http://image.tmdb.org/t/p/w500/${movieDB.posterPath}'
-          : 'no-poster',
+          : 'https://static.wikia.nocookie.net/jujutsu-kaisen/images/7/74/Manga_-_Cap%C3%ADtulo_117.png/revision/latest?cb=20200928141612&path-prefix=es',
       releaseDate: movieDB.releaseDate ?? DateTime.now(),
       title: movieDB.title,
       video: movieDB.video,
