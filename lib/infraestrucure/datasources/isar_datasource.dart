@@ -1,22 +1,52 @@
 import 'package:e_cinemapedia/domain/datasouces/local_storage_datasource.dart';
 import 'package:e_cinemapedia/domain/entities/movie.dart';
 
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
+
 class IsarDatasource extends LocalStorageDatasource {
+  //-------------Creacion o Apertura de la base de datos Local----------//
+  late Future<Isar> db;
+
+  IsarDatasource() {
+    db = openDB();
+  }
+  Future<Isar> openDB() async {
+    final dir = await getApplicationDocumentsDirectory();
+    if (Isar.instanceNames.isEmpty) {
+      return await Isar.open(
+        [MovieSchema],
+        inspector: true,
+        directory: dir.path,
+      );
+    }
+    return Future.value(Isar.getInstance());
+  }
+  //---------------------------------------------------------------------//
+
   @override
-  Future<bool> isMovieFavorite(int movieId) {
-    // TODO: implement isMovieFavorite
-    throw UnimplementedError();
+  Future<bool> isMovieFavorite(int movieId) async {
+    final isar = await db;
+    final Movie? isFavoriteMoview =
+        await isar.movies.filter().idEqualTo(movieId).findFirst();
+    return isFavoriteMoview != null;
   }
 
   @override
-  Future<List<Movie>> loadMovie({int limit = 20, offset = 0}) {
-    // TODO: implement loadMovie
-    throw UnimplementedError();
+  Future<void> toogleFavorite(Movie movie) async {
+    final isar = await db;
+    final favoriteMovie =
+        await isar.movies.filter().idEqualTo(movie.id).findFirst();
+    if (favoriteMovie != null) {
+      isar.writeTxnSync(() => isar.movies.deleteSync(favoriteMovie.isarId!));
+      return;
+    }
+    isar.writeTxnSync(() => isar.movies.putSync(movie));
   }
 
   @override
-  Future<void> toogleFavorite(Movie movie) {
-    // TODO: implement toogleFavorite
-    throw UnimplementedError();
+  Future<List<Movie>> loadMovie({int limit = 10, offset = 0}) async {
+    final isar = await db;
+    return isar.movies.where().offset(offset).limit(limit).findAll();
   }
 }
