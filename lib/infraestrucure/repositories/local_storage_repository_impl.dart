@@ -12,7 +12,7 @@ class LocalStorageRepositoryImpl extends LocalStorageRepository {
   }
 
   @override
-  Future<List<Movie>> loadMovie({int limit = 20, offset = 0}) {
+  Future<List<Movie>> loadMovie({int limit = 10, offset = 0}) {
     return datasource.loadMovie(limit: limit, offset: offset);
   }
 

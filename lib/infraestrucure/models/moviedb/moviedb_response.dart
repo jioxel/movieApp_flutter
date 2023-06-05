@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:e_cinemapedia/infraestrucure/models/moviedb/movie_moviedb.dart';
 
 class MovieDbRsponse {

@@ -25,7 +25,7 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
   Widget build(BuildContext context) {
     final Movie? movie = ref.watch(movieInfoProvider)[widget.movieId];
     if (movie == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(
             strokeWidth: 2,
@@ -36,7 +36,7 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
     return Scaffold(
       body: CustomScrollView(
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         slivers: [
           _CustomSliverAppBar(movie: movie),
           SliverList(
@@ -60,7 +60,7 @@ class _MovieDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -90,10 +90,10 @@ class _MovieDetails extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Wrap(children: [
             ...movie.genreIds.map((gender) => Container(
-                  margin: EdgeInsets.only(right: 10),
+                  margin: const EdgeInsets.only(right: 10),
                   child: Chip(
                     label: Text(gender),
                     shape: RoundedRectangleBorder(
@@ -103,7 +103,7 @@ class _MovieDetails extends StatelessWidget {
           ]),
         ),
         _ActorsByMovie(movieId: movie.id.toString()),
-        SizedBox(
+        const SizedBox(
           height: 50,
         )
       ],
@@ -111,12 +111,19 @@ class _MovieDetails extends StatelessWidget {
   }
 }
 
-class _CustomSliverAppBar extends StatelessWidget {
+final isFavoriteProvider =
+    FutureProvider.family.autoDispose((ref, int movieId) {
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+  return localStorageRepository.isMovieFavorite(movieId);
+});
+
+class _CustomSliverAppBar extends ConsumerWidget {
   final Movie movie;
-  const _CustomSliverAppBar({super.key, required this.movie});
+  const _CustomSliverAppBar({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFavoriteFuture = ref.watch(isFavoriteProvider(movie.id));
     final size = MediaQuery.of(context).size;
     return SliverAppBar(
       backgroundColor: Colors.black,
@@ -124,9 +131,21 @@ class _CustomSliverAppBar extends StatelessWidget {
       foregroundColor: Colors.white,
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            ref.watch(localStorageRepositoryProvider).toogleFavorite(movie);
+            ref.invalidate(isFavoriteProvider(movie.id));
+          },
+          icon: isFavoriteFuture.when(
+            loading: () => const CircularProgressIndicator(
+              strokeWidth: 2,
+            ),
+            data: (isFavorite) => isFavorite
+                ? const Icon(Icons.favorite_rounded, color: Colors.red)
+                : const Icon(Icons.favorite_border_outlined),
+            error: (_, __) => throw UnimplementedError(),
+          ),
           // icon: Icon(Icons.favorite_border_outlined),
-          icon: Icon(Icons.favorite_rounded, color: Colors.red),
+          // icon: const Icon(Icons.favorite_rounded, color: Colors.red),
         )
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -190,7 +209,7 @@ class _ActorsByMovie extends ConsumerWidget {
           final actor = actors[index];
 
           return Container(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             width: 135,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +222,7 @@ class _ActorsByMovie extends ConsumerWidget {
                       width: 135,
                       fit: BoxFit.cover,
                     )),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 Text(
@@ -213,7 +232,7 @@ class _ActorsByMovie extends ConsumerWidget {
                 Text(
                   actor.character ?? '',
                   maxLines: 2,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       overflow: TextOverflow.ellipsis),
                 )
